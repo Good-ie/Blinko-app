@@ -43,7 +43,7 @@ jobs:
 
           # Clone or update repo
           if [ ! -d "blinko-app" ]; then
-            git clone https://github.com/goodie321/blinko-app.git
+            git clone https://github.com/Good-ie/blinko-app.git
             cd blinko-app
           else
             cd blinko-app
