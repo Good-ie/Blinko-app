@@ -62,9 +62,10 @@ jobs:
 
           # Create .env file
           cat <<EOF > .env
-DB_PASSWORD=$DB_PASSWORD
-NEXTAUTH_SECRET=$NEXTAUTH_SECRET
-EOF
+          DB_PASSWORD=$DB_PASSWORD
+          NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+          EOF
+
 
           # Start Blinko containers
           docker-compose down
