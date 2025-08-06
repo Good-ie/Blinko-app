@@ -22,6 +22,7 @@ jobs:
           # Install required packages
           sudo yum update -y
           if ! command -v git &> /dev/null; then
+          sudo yum update -y
             sudo yum install git -y
           fi
 
