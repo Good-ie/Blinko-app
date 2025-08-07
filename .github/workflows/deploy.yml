@@ -49,7 +49,8 @@ jobs:
           NEXT_PUBLIC_BASE_URL=http://${{ secrets.EC2_HOST }}
           NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          DATABASE_URL=postgresql://postgres:${{ secrets.DB_PASSWORD }}@db:5432/postgres
+          DATABASE_URL=postgresql://postgres:${{ secrets.DB_PASSWORD }}@blinko-postgres:5432/postgres
+
           EOF
 
           # 6️⃣ Stop existing containers
