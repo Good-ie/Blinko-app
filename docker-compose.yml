@@ -1,22 +1,26 @@
 version: '3.8'
 
 services:
-  blinko-website:
-    image: blinkospace/blinko:latest
-    container_name: blinko-website
+  db:
+    image: postgres:15
     restart: always
     environment:
-      NODE_ENV: production
-      NEXTAUTH_URL: ${NEXTAUTH_URL}
-      NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL}
-      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DATABASE_URL: ${DATABASE_URL}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "1111:1111"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:1111/"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "1111:3000"  # Host port 1111 maps to app's internal port 3000
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
