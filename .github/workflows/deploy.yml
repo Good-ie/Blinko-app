@@ -19,15 +19,9 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          # Install required packages
-          sudo yum update -y
-          if ! command -v git &> /dev/null; then
-            sudo yum install git -y
-          fi
-
           # Install AWS CLI if missing
           if ! command -v aws &> /dev/null; then
-            sudo yum install -y awscli
+            sudo apt-get update && sudo apt-get install -y awscli
           fi
 
           # Configure AWS CLI
@@ -84,3 +78,4 @@ jobs:
           else
             echo "No dump found in S3. Skipping restore."
           fi
+
