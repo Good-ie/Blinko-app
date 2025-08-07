@@ -1,4 +1,4 @@
-name: Deploy Blinko with RDS DB Restore
+name: Deploy Blinko with Docker PostgreSQL
 
 on:
   push:
@@ -12,14 +12,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Deploy to EC2 and Restore RDS DB
+    - name: Deploy to EC2 and Restore Docker PostgreSQL
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          # 1️⃣ Install required packages
+          # 1️⃣ Install dependencies
           sudo yum update -y
           sudo yum install -y git awscli postgresql
 
@@ -50,14 +50,14 @@ jobs:
           cd blinko-app
           git pull origin main
 
-          # 6️⃣ Create Docker Compose file (if needed) or ensure .env is configured
+          # 6️⃣ Create .env file
           echo "Creating .env file..."
           cat <<EOF > .env
           NEXTAUTH_URL=http://${{ secrets.EC2_HOST }}
           NEXT_PUBLIC_BASE_URL=http://${{ secrets.EC2_HOST }}
           NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          DATABASE_URL=postgresql://postgres:${{ secrets.DB_PASSWORD }}@${{ secrets.RDS_ENDPOINT }}:5432/postgres
+          DATABASE_URL=postgresql://postgres:${{ secrets.DB_PASSWORD }}@localhost:5432/postgres
           EOF
 
           # 7️⃣ Stop old containers
@@ -66,15 +66,15 @@ jobs:
           # 8️⃣ Start app
           docker-compose up -d --build
 
-          # 9️⃣ Wait and restore database
-          echo "Waiting for DB to accept connections..."
+          # 9️⃣ Restore database into Docker PostgreSQL
+          echo "Waiting for database to be ready..."
           sleep 20
           aws s3 cp s3://${{ secrets.S3_BUCKET_NAME }}/blinko_backup.sql .
 
           if [ -f "blinko_backup.sql" ]; then
-            echo "Restoring database into RDS..."
-            PGPASSWORD=${{ secrets.DB_PASSWORD }} psql -h ${{ secrets.RDS_ENDPOINT }} -U postgres -d postgres < blinko_backup.sql
-            echo "Database restored!"
+            echo "Restoring into Docker PostgreSQL..."
+            docker exec -i $(docker ps -qf "name=postgres") psql -U postgres -d postgres < blinko_backup.sql
+            echo "Database restore completed!"
             rm -f blinko_backup.sql
           else
             echo "No SQL dump found. Skipping restore."
