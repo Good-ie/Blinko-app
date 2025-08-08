@@ -4,7 +4,6 @@ networks:
   blinko-network:
     driver: bridge
 
-
 services:
   blinko-website:
     image: blinkospace/blinko:latest
@@ -19,7 +18,7 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "1111:3000"
+      - "1111:3000" # External:Internal
     restart: always
     networks:
       - blinko-network
