@@ -48,6 +48,3 @@ services:
       interval: 5s
       timeout: 10s
       retries: 5
-
-      
-
