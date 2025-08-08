@@ -54,11 +54,13 @@ jobs:
           export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
           export NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
 
+          # Create .env file
           cat <<EOF > .env
-          DB_PASSWORD=$DB_PASSWORD
-          NEXTAUTH_SECRET=$NEXTAUTH_SECRET
-          DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@172.18.0.2:5432/postgres
+          DB_PASSWORD=${DB_PASSWORD}
+          NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+          DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/postgres
           EOF
+
 
           # Start Blinko containers
           docker-compose down
