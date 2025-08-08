@@ -11,8 +11,8 @@ services:
     container_name: blinko-website
     environment:
       NODE_ENV: production
-      NEXTAUTH_URL: http://13.222.177.31
-      NEXT_PUBLIC_BASE_URL: http://13.222.177.31
+      NEXTAUTH_URL: http://13.222.177.31:1111
+      NEXT_PUBLIC_BASE_URL: http://13.222.177.31:1111
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
       DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@postgres:5432/postgres
     depends_on:
@@ -24,7 +24,7 @@ services:
     networks:
       - blinko-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:1111/"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
       interval: 30s
       timeout: 10s
       retries: 5
