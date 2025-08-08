@@ -41,29 +41,32 @@ jobs:
             sudo chmod +x /usr/local/bin/docker-compose
           fi
 
-          # Clone or update repo
+          # Clone or update repo (force overwrite local changes)
           if [ ! -d "blinko-app" ]; then
             git clone https://github.com/Good-ie/blinko-app.git
             cd blinko-app
           else
             cd blinko-app
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
           fi
 
           # Export secrets for docker-compose
           export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
           export NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
 
-          # Create .env file
+          # Create .env file (overwrites every time)
           cat <<EOF > .env
           DB_PASSWORD=${DB_PASSWORD}
           NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
           DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/postgres
           EOF
 
+          # Stop and remove any old containers/images
+          docker-compose down --volumes --remove-orphans
+          docker system prune -af
 
-          # Start Blinko containers
-          docker-compose down
+          # Start Blinko containers fresh
           docker-compose up -d --build
 
           # Wait for Postgres
@@ -80,5 +83,3 @@ jobs:
           else
             echo "No dump found in S3. Skipping restore."
           fi
-
-
